@@ -2,6 +2,12 @@ import streamlit as st
 import datetime
 import requests
 
+algoliaPlacesApiAppId = 'MM1BWXHPTD'
+algoliaPlacesApiKey = '5543b7a01315f7b399e9663ad49a85bd'
+
+
+
+
 '''
 # TaxiFareModel front
 '''
@@ -24,10 +30,17 @@ pickup_time = columns[1].time_input("For which time do you want to schedule the 
 
 pickup_datetime = str(pickup_date) + " " + str(pickup_time)
 
-pickup_longitude = columns[0].text_input('What is your pickup longitude?',
-                                 '-73.950655')
+url = 'https://places-dsn.algolia.net/1/places/query'
 
-pickup_latitude = columns[1].text_input('What is your pickup latitude?', '40.783282')
+pickup_address = columns[1].text_input('Where are you gonna be picked up?',
+                                       'Empire State Building')
+
+response = requests.get(url, {"query": pickup_address})
+
+pickup_geoloc = response.json()["hits"][0]["_geoloc"]
+
+pickup_longitude = pickup_geoloc["lng"]
+pickup_latitude = pickup_geoloc["lat"]
 
 dropoff_longitude = columns[0].text_input('What is your dropoff longitude?',
                                   '-73.984365')
