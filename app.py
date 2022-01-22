@@ -1,4 +1,7 @@
 import streamlit as st
+import datetime
+import requests
+
 '''
 # TaxiFareModel front
 '''
@@ -12,13 +15,27 @@ Either as with the title by just creating a string (or an f-string). Or as with 
 ## Here we would like to add some controllers in order to ask the user to select the parameters of the ride
 
 1. Let's ask for:
-- date and time
-- pickup longitude
-- pickup latitude
-- dropoff longitude
-- dropoff latitude
-- passenger count
 '''
+
+columns = st.columns(2)
+
+pickup_date = columns[0].date_input("For which day do you want to schedule the ride?", datetime.date(2019, 7, 6))
+pickup_time = columns[1].time_input("For which time do you want to schedule the ride?", datetime.time(11,00,00))
+
+pickup_datetime = str(pickup_date) + " " + str(pickup_time)
+
+pickup_longitude = columns[0].text_input('What is your pickup longitude?',
+                                 '-73.950655')
+
+pickup_latitude = columns[1].text_input('What is your pickup latitude?', '40.783282')
+
+dropoff_longitude = columns[0].text_input('What is your dropoff longitude?',
+                                  '-73.984365')
+
+dropoff_latitude = columns[1].text_input('What is your dropoff latitude?', '40.769802')
+
+passenger_count = st.text_input("How many passengers will you be", "1")
+
 '''
 ## Once we have these, let's call our API in order to retrieve a prediction
 
@@ -37,10 +54,34 @@ if url == 'https://taxifare.lewagon.ai/predict':
 '''
 
 2. Let's build a dictionary containing the parameters for our API...
+'''
 
+params = {
+    "key": "key",
+    "pickup_datetime": pickup_datetime,
+    "pickup_longitude": pickup_longitude,
+    "pickup_latitude": pickup_latitude,
+    "dropoff_longitude": dropoff_longitude,
+    "dropoff_latitude": dropoff_latitude,
+    "passenger_count": passenger_count
+}
+
+'''
 3. Let's call our API using the `requests` package...
+'''
 
+response = requests.get(url, params=params)
+
+'''
 4. Let's retrieve the prediction from the **JSON** returned by the API...
+
+'''
+
+prediction = response.json()["prediction"][0]
+
+'''
 
 ## Finally, we can display the prediction to the user
 '''
+
+st.write(f"Your fare will cost ${round(prediction, 2)}")
