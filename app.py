@@ -32,7 +32,7 @@ pickup_datetime = str(pickup_date) + " " + str(pickup_time)
 
 url = 'https://places-dsn.algolia.net/1/places/query'
 
-pickup_address = columns[1].text_input('Where are you gonna be picked up?',
+pickup_address = columns[0].text_input('Where are you gonna be picked up?',
                                        'Empire State Building')
 
 response = requests.get(url, {"query": pickup_address})
@@ -42,10 +42,15 @@ pickup_geoloc = response.json()["hits"][0]["_geoloc"]
 pickup_longitude = pickup_geoloc["lng"]
 pickup_latitude = pickup_geoloc["lat"]
 
-dropoff_longitude = columns[0].text_input('What is your dropoff longitude?',
-                                  '-73.984365')
+dropoff_address = columns[1].text_input('Where are you going?',
+                                       'Rockefeller Center')
 
-dropoff_latitude = columns[1].text_input('What is your dropoff latitude?', '40.769802')
+response = requests.get(url, {"query": dropoff_address})
+
+dropoff_geoloc = response.json()["hits"][0]["_geoloc"]
+
+dropoff_longitude = dropoff_geoloc["lng"]
+dropoff_latitude = dropoff_geoloc["lat"]
 
 passenger_count = st.text_input("How many passengers will you be", "1")
 
